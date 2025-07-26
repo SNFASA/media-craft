@@ -36,7 +36,8 @@ export default function CreateNews() {
     description: "",
     content: "",
     category: "" as NewsCategory | "",
-    status: "draft" as "draft" | "published"
+    status: "draft" as "draft" | "published",
+    author: ""
   });
   const [imagePreview, setImagePreview] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -74,6 +75,15 @@ export default function CreateNews() {
       toast({
         title: "Validation Error", 
         description: "Please select a category.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!formData.author.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Please enter an author name.",
         variant: "destructive"
       });
       return;
@@ -152,6 +162,16 @@ export default function CreateNews() {
                   onChange={(e) => handleInputChange("description", e.target.value)}
                   placeholder="Brief description of the article..."
                   rows={3}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="author">Author *</Label>
+                <Input
+                  id="author"
+                  value={formData.author}
+                  onChange={(e) => handleInputChange("author", e.target.value)}
+                  placeholder="Enter author name..."
                 />
               </div>
 

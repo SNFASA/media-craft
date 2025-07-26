@@ -8,6 +8,12 @@ import Dashboard from "./pages/admin/Dashboard";
 import NewsIndex from "./pages/admin/news/NewsIndex";
 import CreateNews from "./pages/admin/news/CreateNews";
 import ViewNews from "./pages/admin/news/ViewNews";
+import EventsIndex from "./pages/admin/events/EventsIndex";
+import CreateEvent from "./pages/admin/events/CreateEvent";
+import ViewEvent from "./pages/admin/events/ViewEvent";
+import GalleryIndex from "./pages/admin/gallery/GalleryIndex";
+import MediaIndex from "./pages/admin/media/MediaIndex";
+import DeanOrganization from "./pages/admin/organization/DeanOrganization";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -46,45 +52,45 @@ const App = () => (
             </AdminLayout>
           } />
           
-          {/* Placeholder for other admin routes */}
+          {/* Events Routes */}
           <Route path="/admin/events" element={
             <AdminLayout>
-              <div className="text-center py-12">
-                <h2 className="text-2xl font-bold mb-4">Events Management</h2>
-                <p className="text-muted-foreground">Coming soon...</p>
-              </div>
+              <EventsIndex />
+            </AdminLayout>
+          } />
+          <Route path="/admin/events/create" element={
+            <AdminLayout>
+              <CreateEvent />
+            </AdminLayout>
+          } />
+          <Route path="/admin/events/:id" element={
+            <AdminLayout>
+              <ViewEvent />
+            </AdminLayout>
+          } />
+          <Route path="/admin/events/:id/edit" element={
+            <AdminLayout>
+              <CreateEvent />
             </AdminLayout>
           } />
           <Route path="/admin/gallery" element={
             <AdminLayout>
-              <div className="text-center py-12">
-                <h2 className="text-2xl font-bold mb-4">Gallery Management</h2>
-                <p className="text-muted-foreground">Coming soon...</p>
-              </div>
+              <GalleryIndex />
             </AdminLayout>
           } />
           <Route path="/admin/media" element={
             <AdminLayout>
-              <div className="text-center py-12">
-                <h2 className="text-2xl font-bold mb-4">Media Manager</h2>
-                <p className="text-muted-foreground">Coming soon...</p>
-              </div>
+              <MediaIndex />
             </AdminLayout>
           } />
           <Route path="/admin/organization/dean" element={
             <AdminLayout>
-              <div className="text-center py-12">
-                <h2 className="text-2xl font-bold mb-4">Dean's Organization</h2>
-                <p className="text-muted-foreground">Coming soon...</p>
-              </div>
+              <DeanOrganization />
             </AdminLayout>
           } />
           <Route path="/admin/organization/itc" element={
             <AdminLayout>
-              <div className="text-center py-12">
-                <h2 className="text-2xl font-bold mb-4">ITC Organization</h2>
-                <p className="text-muted-foreground">Coming soon...</p>
-              </div>
+              <DeanOrganization />
             </AdminLayout>
           } />
 

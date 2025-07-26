@@ -7,6 +7,7 @@ export interface NewsArticle {
   category: NewsCategory;
   slug: string;
   status: 'draft' | 'published';
+  author: string;
   createdAt: Date;
   updatedAt: Date;
   publishedAt?: Date;
