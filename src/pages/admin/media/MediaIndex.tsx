@@ -199,12 +199,12 @@ export default function MediaIndex() {
               />
             </div>
             <div className="flex flex-col sm:flex-row gap-2">
-              <Select value={selectedType} onValueChange={(value) => setSelectedType(value as MediaFile['type'] | "")}>
+              <Select value={selectedType || "all"} onValueChange={(value) => setSelectedType(value === "all" ? "" : value as MediaFile['type'])}>
                 <SelectTrigger className="w-[140px]">
                   <SelectValue placeholder="File Type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Types</SelectItem>
+                  <SelectItem value="all">All Types</SelectItem>
                   <SelectItem value="image">Images</SelectItem>
                   <SelectItem value="document">Documents</SelectItem>
                   <SelectItem value="video">Videos</SelectItem>
