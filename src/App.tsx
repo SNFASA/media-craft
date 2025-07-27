@@ -4,6 +4,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AdminLayout } from "./layouts/AdminLayout";
+import { AuthProvider } from "./contexts/AuthContext";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import Login from "./pages/Login";
 import Dashboard from "./pages/admin/Dashboard";
 import NewsIndex from "./pages/admin/news/NewsIndex";
 import CreateNews from "./pages/admin/news/CreateNews";
@@ -27,101 +30,139 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          {/* Admin Routes */}
-          <Route path="/admin" element={
-            <AdminLayout>
-              <Dashboard />
-            </AdminLayout>
-          } />
-          <Route path="/admin/news" element={
-            <AdminLayout>
-              <NewsIndex />
-            </AdminLayout>
-          } />
-          <Route path="/admin/news/create" element={
-            <AdminLayout>
-              <CreateNews />
-            </AdminLayout>
-          } />
-          <Route path="/admin/news/:id" element={
-            <AdminLayout>
-              <ViewNews />
-            </AdminLayout>
-          } />
-          <Route path="/admin/news/:id/edit" element={
-            <AdminLayout>
-              <CreateNews />
-            </AdminLayout>
-          } />
+        <AuthProvider>
+          <Routes>
+            {/* Login Route */}
+            <Route path="/login" element={<Login />} />
+            {/* Protected Admin Routes */}
+            <Route path="/admin" element={
+              <ProtectedRoute>
+                <AdminLayout>
+                  <Dashboard />
+                </AdminLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/news" element={
+              <ProtectedRoute>
+                <AdminLayout>
+                  <NewsIndex />
+                </AdminLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/news/create" element={
+              <ProtectedRoute>
+                <AdminLayout>
+                  <CreateNews />
+                </AdminLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/news/:id" element={
+              <ProtectedRoute>
+                <AdminLayout>
+                  <ViewNews />
+                </AdminLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/news/:id/edit" element={
+              <ProtectedRoute>
+                <AdminLayout>
+                  <CreateNews />
+                </AdminLayout>
+              </ProtectedRoute>
+            } />
           
-          {/* Events Routes */}
-          <Route path="/admin/events" element={
-            <AdminLayout>
-              <EventsIndex />
-            </AdminLayout>
-          } />
-          <Route path="/admin/events/create" element={
-            <AdminLayout>
-              <CreateEvent />
-            </AdminLayout>
-          } />
-          <Route path="/admin/events/:id" element={
-            <AdminLayout>
-              <ViewEvent />
-            </AdminLayout>
-          } />
-          <Route path="/admin/events/:id/edit" element={
-            <AdminLayout>
-              <CreateEvent />
-            </AdminLayout>
-          } />
-          <Route path="/admin/gallery" element={
-            <AdminLayout>
-              <GalleryIndex />
-            </AdminLayout>
-          } />
-          <Route path="/admin/gallery/create" element={
-            <AdminLayout>
-              <CreateGallery />
-            </AdminLayout>
-          } />
-          <Route path="/admin/gallery/:id" element={
-            <AdminLayout>
-              <ViewGallery />
-            </AdminLayout>
-          } />
-          <Route path="/admin/gallery/:id/edit" element={
-            <AdminLayout>
-              <CreateGallery />
-            </AdminLayout>
-          } />
-          <Route path="/admin/media" element={
-            <AdminLayout>
-              <MediaIndex />
-            </AdminLayout>
-          } />
-          <Route path="/admin/organization/dean" element={
-            <AdminLayout>
-              <DeanOrganization />
-            </AdminLayout>
-          } />
-          <Route path="/admin/organization/itc" element={
-            <AdminLayout>
-              <ItcOrganization />
-            </AdminLayout>
-          } />
+            {/* Events Routes */}
+            <Route path="/admin/events" element={
+              <ProtectedRoute>
+                <AdminLayout>
+                  <EventsIndex />
+                </AdminLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/events/create" element={
+              <ProtectedRoute>
+                <AdminLayout>
+                  <CreateEvent />
+                </AdminLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/events/:id" element={
+              <ProtectedRoute>
+                <AdminLayout>
+                  <ViewEvent />
+                </AdminLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/events/:id/edit" element={
+              <ProtectedRoute>
+                <AdminLayout>
+                  <CreateEvent />
+                </AdminLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/gallery" element={
+              <ProtectedRoute>
+                <AdminLayout>
+                  <GalleryIndex />
+                </AdminLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/gallery/create" element={
+              <ProtectedRoute>
+                <AdminLayout>
+                  <CreateGallery />
+                </AdminLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/gallery/:id" element={
+              <ProtectedRoute>
+                <AdminLayout>
+                  <ViewGallery />
+                </AdminLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/gallery/:id/edit" element={
+              <ProtectedRoute>
+                <AdminLayout>
+                  <CreateGallery />
+                </AdminLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/media" element={
+              <ProtectedRoute>
+                <AdminLayout>
+                  <MediaIndex />
+                </AdminLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/organization/dean" element={
+              <ProtectedRoute>
+                <AdminLayout>
+                  <DeanOrganization />
+                </AdminLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/organization/itc" element={
+              <ProtectedRoute>
+                <AdminLayout>
+                  <ItcOrganization />
+                </AdminLayout>
+              </ProtectedRoute>
+            } />
 
-          {/* Redirect root to admin */}
-          <Route path="/" element={
-            <AdminLayout>
-              <Dashboard />
-            </AdminLayout>
-          } />
-          
-          {/* 404 */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+            {/* Redirect root to admin */}
+            <Route path="/" element={
+              <ProtectedRoute>
+                <AdminLayout>
+                  <Dashboard />
+                </AdminLayout>
+              </ProtectedRoute>
+            } />
+            
+            {/* 404 */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
