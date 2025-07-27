@@ -123,12 +123,12 @@ export default function EventsIndex() {
               />
             </div>
             <div className="flex flex-col sm:flex-row gap-2">
-              <Select value={selectedEligibility} onValueChange={(value) => setSelectedEligibility(value as EventEligibility | "")}>
+              <Select value={selectedEligibility || "all"} onValueChange={(value) => setSelectedEligibility(value === "all" ? "" : value as EventEligibility)}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Eligibility" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Eligibility</SelectItem>
+                  <SelectItem value="all">All Eligibility</SelectItem>
                   {Object.entries(eligibilityLabels).map(([value, label]) => (
                     <SelectItem key={value} value={value}>
                       {label}
@@ -136,12 +136,12 @@ export default function EventsIndex() {
                   ))}
                 </SelectContent>
               </Select>
-              <Select value={selectedStatus} onValueChange={(value) => setSelectedStatus(value as Event['status'] | "")}>
+              <Select value={selectedStatus || "all"} onValueChange={(value) => setSelectedStatus(value === "all" ? "" : value as Event['status'])}>
                 <SelectTrigger className="w-[140px]">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Status</SelectItem>
+                  <SelectItem value="all">All Status</SelectItem>
                   <SelectItem value="upcoming">Upcoming</SelectItem>
                   <SelectItem value="ongoing">Ongoing</SelectItem>
                   <SelectItem value="completed">Completed</SelectItem>
