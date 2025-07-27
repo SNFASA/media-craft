@@ -121,12 +121,12 @@ export default function GalleryIndex() {
               />
             </div>
             <div className="flex flex-col sm:flex-row gap-2">
-              <Select value={selectedCategory} onValueChange={(value) => setSelectedCategory(value as GalleryCategory | "")}>
+              <Select value={selectedCategory || "all"} onValueChange={(value) => setSelectedCategory(value === "all" ? "" : value as GalleryCategory)}>
                 <SelectTrigger className="w-[160px]">
                   <SelectValue placeholder="Category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Categories</SelectItem>
+                  <SelectItem value="all">All Categories</SelectItem>
                   {Object.entries(categoryLabels).map(([value, label]) => (
                     <SelectItem key={value} value={value}>
                       {label}
@@ -134,12 +134,12 @@ export default function GalleryIndex() {
                   ))}
                 </SelectContent>
               </Select>
-              <Select value={showFeatured?.toString() || ""} onValueChange={(value) => setShowFeatured(value === "" ? undefined : value === "true")}>
+              <Select value={showFeatured?.toString() || "all"} onValueChange={(value) => setShowFeatured(value === "all" ? undefined : value === "true")}>
                 <SelectTrigger className="w-[140px]">
                   <SelectValue placeholder="Featured" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Items</SelectItem>
+                  <SelectItem value="all">All Items</SelectItem>
                   <SelectItem value="true">Featured</SelectItem>
                   <SelectItem value="false">Not Featured</SelectItem>
                 </SelectContent>
