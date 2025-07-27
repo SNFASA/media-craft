@@ -16,6 +16,7 @@ import MediaIndex from "./pages/admin/media/MediaIndex";
 import DeanOrganization from "./pages/admin/organization/DeanOrganization";
 import ItcOrganization from "./pages/admin/organization/ItcOrganization";
 import CreateGallery from "./pages/admin/gallery/CreateGallery";
+import ViewGallery from "./pages/admin/gallery/ViewGallery";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -83,6 +84,11 @@ const App = () => (
           <Route path="/admin/gallery/create" element={
             <AdminLayout>
               <CreateGallery />
+            </AdminLayout>
+          } />
+          <Route path="/admin/gallery/:id" element={
+            <AdminLayout>
+              <ViewGallery />
             </AdminLayout>
           } />
           <Route path="/admin/gallery/:id/edit" element={
