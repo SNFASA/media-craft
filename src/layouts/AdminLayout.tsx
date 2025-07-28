@@ -46,7 +46,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             <div className="flex items-center gap-4">
               <SidebarTrigger />
               <h1 className="text-xl font-semibold text-foreground">
-                University Admin Dashboard
+                Information Technology Club Admin Dashboard
               </h1>
             </div>
             

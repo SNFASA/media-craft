@@ -148,7 +148,7 @@ export default function CreateEvent() {
             {isEditing ? 'Edit Event' : 'Create Event'}
           </h2>
           <p className="text-muted-foreground">
-            {isEditing ? 'Update event details' : 'Create a new university event or activity.'}
+            {isEditing ? 'Update event details' : 'Create a new club event or activity.'}
           </p>
         </div>
       </div>

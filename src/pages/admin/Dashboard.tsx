@@ -1,13 +1,13 @@
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+
 import { 
   Newspaper, 
   Calendar, 
   Images, 
   Users, 
   TrendingUp,
-  Eye,
-  MessageSquare,
   Clock
 } from "lucide-react";
 
@@ -79,7 +79,7 @@ export default function Dashboard() {
       <div>
         <h2 className="text-3xl font-bold text-foreground mb-2">Dashboard</h2>
         <p className="text-muted-foreground">
-          Welcome back! Here's what's happening with your university portal.
+          Welcome back! Here's what's happening with your club portal.
         </p>
       </div>
 
@@ -150,27 +150,38 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 gap-3">
-              <button className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-accent transition-colors text-left">
+              <Link
+                to="/admin/news/create"
+                className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-accent transition-colors text-left"
+              >
                 <Newspaper className="h-5 w-5 text-primary" />
                 <div>
                   <p className="font-medium text-foreground">Create News Article</p>
                   <p className="text-sm text-muted-foreground">Publish latest updates</p>
                 </div>
-              </button>
-              <button className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-accent transition-colors text-left">
+              </Link>
+
+              <Link
+                to="/admin/events/create"
+                className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-accent transition-colors text-left"
+              >
                 <Calendar className="h-5 w-5 text-primary" />
                 <div>
                   <p className="font-medium text-foreground">Add New Event</p>
                   <p className="text-sm text-muted-foreground">Schedule upcoming events</p>
                 </div>
-              </button>
-              <button className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-accent transition-colors text-left">
+              </Link>
+
+              <Link
+                to="/admin/gallery/create"
+                className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-accent transition-colors text-left"
+              >
                 <Images className="h-5 w-5 text-primary" />
                 <div>
                   <p className="font-medium text-foreground">Upload to Gallery</p>
                   <p className="text-sm text-muted-foreground">Add new photos</p>
                 </div>
-              </button>
+              </Link>
             </div>
           </CardContent>
         </Card>

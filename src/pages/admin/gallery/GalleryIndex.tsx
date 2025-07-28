@@ -96,7 +96,7 @@ export default function GalleryIndex() {
         <div>
           <h2 className="text-3xl font-bold text-foreground">Gallery Management</h2>
           <p className="text-muted-foreground">
-            Manage university photos, event galleries, and visual content.
+            Manage club photos, event galleries, and visual content.
           </p>
         </div>
         <Button asChild className="bg-gradient-primary">

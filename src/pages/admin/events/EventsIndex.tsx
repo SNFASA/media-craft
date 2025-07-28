@@ -98,7 +98,7 @@ export default function EventsIndex() {
         <div>
           <h2 className="text-3xl font-bold text-foreground">Events Management</h2>
           <p className="text-muted-foreground">
-            Manage university events, workshops, and activities.
+            Manage club events, workshops, and activities.
           </p>
         </div>
         <Button asChild className="bg-gradient-primary">

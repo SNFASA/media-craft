@@ -66,9 +66,16 @@ export function AdminSidebar() {
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border p-4">
         {!isCollapsed && (
-          <h2 className="text-lg font-semibold text-sidebar-foreground">
-            Admin Panel
-          </h2>
+          <div className="flex flex-col items-center space-y-3">
+            <img
+              src="/itc-half.png"
+              alt="Logo"
+              className="w-16 h-16 object-contain"
+            />
+            <h2 className="text-lg font-semibold text-sidebar-foreground">
+              Admin Panel
+            </h2>
+          </div>
         )}
         {isCollapsed && <Menu className="h-5 w-5 text-sidebar-foreground" />}
       </SidebarHeader>
