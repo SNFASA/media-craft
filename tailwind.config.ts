@@ -79,7 +79,8 @@ export default {
 			boxShadow: {
 				'soft': 'var(--shadow-soft)',
 				'medium': 'var(--shadow-medium)',
-				'large': 'var(--shadow-large)'
+				'large': 'var(--shadow-large)',
+				'elevated': '0 10px 40px -10px hsl(var(--primary) / 0.2)'
 			},
 			transitionProperty: {
 				'smooth': 'var(--transition-smooth)',

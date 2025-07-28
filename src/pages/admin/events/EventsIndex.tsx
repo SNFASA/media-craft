@@ -197,7 +197,7 @@ export default function EventsIndex() {
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
+                    <DropdownMenuContent align="end" className="bg-popover">
                       <DropdownMenuItem asChild>
                         <Link to={`/admin/events/${event.id}`}>
                           <Eye className="h-4 w-4 mr-2" />
