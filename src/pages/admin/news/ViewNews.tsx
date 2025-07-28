@@ -1,4 +1,5 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
+import DOMPurify from 'dompurify';
 import { useNewsStore } from "@/stores/newsStore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -147,7 +148,7 @@ export default function ViewNews() {
             <div className="prose prose-gray max-w-none">
               <div 
                 className="text-foreground leading-relaxed space-y-4"
-                dangerouslySetInnerHTML={{ __html: article.content || '' }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.content || '') }}
               />
               {!article.content && (
                 <p className="text-muted-foreground italic">
