@@ -14,7 +14,233 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      event: {
+        Row: {
+          capacity: number | null
+          created_at: string | null
+          date: string
+          description: string
+          eligibility: Database["public"]["Enums"]["eventeligibility"]
+          id: string
+          image: string | null
+          location: string
+          registration_required: boolean | null
+          status: string
+          time: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          capacity?: number | null
+          created_at?: string | null
+          date: string
+          description: string
+          eligibility: Database["public"]["Enums"]["eventeligibility"]
+          id?: string
+          image?: string | null
+          location: string
+          registration_required?: boolean | null
+          status: string
+          time: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          capacity?: number | null
+          created_at?: string | null
+          date?: string
+          description?: string
+          eligibility?: Database["public"]["Enums"]["eventeligibility"]
+          id?: string
+          image?: string | null
+          location?: string
+          registration_required?: boolean | null
+          status?: string
+          time?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      excomember: {
+        Row: {
+          category: string
+          id: string
+          image: string | null
+          is_head: boolean | null
+          name: string
+          order: number
+          position: string
+        }
+        Insert: {
+          category: string
+          id?: string
+          image?: string | null
+          is_head?: boolean | null
+          name: string
+          order: number
+          position: string
+        }
+        Update: {
+          category?: string
+          id?: string
+          image?: string | null
+          is_head?: boolean | null
+          name?: string
+          order?: number
+          position?: string
+        }
+        Relationships: []
+      }
+      excosection: {
+        Row: {
+          category: string
+          head: string | null
+          id: string
+          organization_type: string
+        }
+        Insert: {
+          category: string
+          head?: string | null
+          id?: string
+          organization_type: string
+        }
+        Update: {
+          category?: string
+          head?: string | null
+          id?: string
+          organization_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "excosection_head_fkey"
+            columns: ["head"]
+            isOneToOne: false
+            referencedRelation: "excomember"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      galleryitem: {
+        Row: {
+          additional_images: string[] | null
+          category: Database["public"]["Enums"]["gallerycategory"]
+          created_at: string | null
+          date: string
+          description: string
+          featured: boolean | null
+          id: string
+          main_image: string
+          size: string
+          tags: string[] | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          additional_images?: string[] | null
+          category: Database["public"]["Enums"]["gallerycategory"]
+          created_at?: string | null
+          date: string
+          description: string
+          featured?: boolean | null
+          id?: string
+          main_image: string
+          size: string
+          tags?: string[] | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          additional_images?: string[] | null
+          category?: Database["public"]["Enums"]["gallerycategory"]
+          created_at?: string | null
+          date?: string
+          description?: string
+          featured?: boolean | null
+          id?: string
+          main_image?: string
+          size?: string
+          tags?: string[] | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      mediafile: {
+        Row: {
+          created_at: string | null
+          filename: string
+          id: string
+          original_name: string
+          size: number
+          type: string
+          url: string
+        }
+        Insert: {
+          created_at?: string | null
+          filename: string
+          id?: string
+          original_name: string
+          size: number
+          type: string
+          url: string
+        }
+        Update: {
+          created_at?: string | null
+          filename?: string
+          id?: string
+          original_name?: string
+          size?: number
+          type?: string
+          url?: string
+        }
+        Relationships: []
+      }
+      newsarticle: {
+        Row: {
+          author: string
+          category: Database["public"]["Enums"]["news_category"]
+          content: string
+          created_at: string | null
+          description: string
+          id: string
+          image: string | null
+          published_at: string | null
+          slug: string
+          status: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          author: string
+          category: Database["public"]["Enums"]["news_category"]
+          content: string
+          created_at?: string | null
+          description: string
+          id?: string
+          image?: string | null
+          published_at?: string | null
+          slug: string
+          status: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          author?: string
+          category?: Database["public"]["Enums"]["news_category"]
+          content?: string
+          created_at?: string | null
+          description?: string
+          id?: string
+          image?: string | null
+          published_at?: string | null
+          slug?: string
+          status?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +249,27 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      eventeligibility:
+        | "all-students"
+        | "undergraduates"
+        | "graduates"
+        | "faculty"
+        | "staff"
+        | "public"
+      gallerycategory:
+        | "events"
+        | "campus"
+        | "academic"
+        | "sports"
+        | "cultural"
+        | "graduation"
+      news_category:
+        | "general"
+        | "academic"
+        | "research"
+        | "events"
+        | "announcements"
+        | "student-life"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +396,31 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      eventeligibility: [
+        "all-students",
+        "undergraduates",
+        "graduates",
+        "faculty",
+        "staff",
+        "public",
+      ],
+      gallerycategory: [
+        "events",
+        "campus",
+        "academic",
+        "sports",
+        "cultural",
+        "graduation",
+      ],
+      news_category: [
+        "general",
+        "academic",
+        "research",
+        "events",
+        "announcements",
+        "student-life",
+      ],
+    },
   },
 } as const
