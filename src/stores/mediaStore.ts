@@ -1,5 +1,6 @@
 import { MediaFile } from '@/types';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { supabase } from '@/integrations/supabase/client';
+import { useState, useEffect } from 'react';
 
 const mockMedia: MediaFile[] = [
   {
@@ -32,20 +33,89 @@ const mockMedia: MediaFile[] = [
 ];
 
 export function useMediaStore() {
-  const [media, setMedia] = useLocalStorage<MediaFile[]>('admin_media', mockMedia);
+  const [media, setMedia] = useState<MediaFile[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const addMediaFile = (fileData: Omit<MediaFile, 'id' | 'createdAt'>) => {
-    const newFile: MediaFile = {
-      id: Date.now().toString(),
-      createdAt: new Date(),
-      ...fileData,
-    };
-    setMedia(prev => [newFile, ...prev]);
-    return newFile;
+  useEffect(() => {
+    fetchMedia();
+  }, []);
+
+  const fetchMedia = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('mediafile')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const formattedMedia: MediaFile[] = data.map(file => ({
+        id: file.id,
+        filename: file.filename,
+        originalName: file.original_name,
+        url: file.url,
+        type: file.type as MediaFile['type'],
+        size: file.size,
+        createdAt: new Date(file.created_at),
+      }));
+
+      setMedia(formattedMedia);
+    } catch (error) {
+      console.error('Error fetching media:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const deleteMediaFile = (id: string) => {
-    setMedia(prev => prev.filter(file => file.id !== id));
+  const addMediaFile = async (fileData: Omit<MediaFile, 'id' | 'createdAt'>) => {
+    try {
+      const { data, error } = await supabase
+        .from('mediafile')
+        .insert([{
+          filename: fileData.filename,
+          original_name: fileData.originalName,
+          url: fileData.url,
+          type: fileData.type,
+          size: fileData.size,
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      const newFile: MediaFile = {
+        id: data.id,
+        filename: data.filename,
+        originalName: data.original_name,
+        url: data.url,
+        type: data.type as MediaFile['type'],
+        size: data.size,
+        createdAt: new Date(data.created_at),
+      };
+
+      setMedia(prev => [newFile, ...prev]);
+      return newFile;
+    } catch (error) {
+      console.error('Error adding media file:', error);
+      throw error;
+    }
+  };
+
+  const deleteMediaFile = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('mediafile')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setMedia(prev => prev.filter(file => file.id !== id));
+    } catch (error) {
+      console.error('Error deleting media file:', error);
+      throw error;
+    }
   };
 
   const getMediaFile = (id: string) => {
@@ -74,10 +144,12 @@ export function useMediaStore() {
 
   return {
     media,
+    loading,
     addMediaFile,
     deleteMediaFile,
     getMediaFile,
     searchMedia,
     formatFileSize,
+    fetchMedia,
   };
 }

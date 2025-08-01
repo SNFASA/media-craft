@@ -110,13 +110,13 @@ export default function CreateEvent() {
       };
 
       if (isEditing) {
-        updateEvent(id!, eventData);
+        await updateEvent(id!, eventData);
         toast({
           title: "Success!",
           description: "Event updated successfully."
         });
       } else {
-        addEvent(eventData);
+        await addEvent(eventData);
         toast({
           title: "Success!",
           description: "Event created successfully."

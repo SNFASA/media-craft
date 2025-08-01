@@ -51,7 +51,7 @@ const statusColors = {
 };
 
 export default function NewsIndex() {
-  const { news, deleteNews, searchNews } = useNewsStore();
+  const { news, loading, deleteNews, searchNews } = useNewsStore();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<NewsCategory | "all">("all");
@@ -61,12 +61,20 @@ export default function NewsIndex() {
     selectedCategory === "all" ? undefined : selectedCategory
   );
 
-  const handleDelete = (id: string, title: string) => {
-    deleteNews(id);
-    toast({
-      title: "Article deleted",
-      description: `"${title}" has been successfully deleted.`,
-    });
+  const handleDelete = async (id: string, title: string) => {
+    try {
+      await deleteNews(id);
+      toast({
+        title: "Article deleted",
+        description: `"${title}" has been successfully deleted.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete article. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const formatDate = (date: Date) => {

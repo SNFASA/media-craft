@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useNewsStore } from "@/stores/newsStore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -28,18 +28,22 @@ const categoryLabels: Record<NewsCategory, string> = {
 
 export default function CreateNews() {
   const navigate = useNavigate();
-  const { addNews } = useNewsStore();
+  const { id } = useParams();
+  const { addNews, updateNews, getNews } = useNewsStore();
   const { toast } = useToast();
   
+  const isEditing = Boolean(id);
+  const existingNews = isEditing ? getNews(id!) : null;
+  
   const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    content: "",
-    category: "" as NewsCategory | "",
-    status: "draft" as "draft" | "published",
-    author: ""
+    title: existingNews?.title || "",
+    description: existingNews?.description || "",
+    content: existingNews?.content || "",
+    category: existingNews?.category || "" as NewsCategory | "",
+    status: existingNews?.status || "draft" as "draft" | "published",
+    author: existingNews?.author || ""
   });
-  const [imagePreview, setImagePreview] = useState<string>("");
+  const [imagePreview, setImagePreview] = useState<string>(existingNews?.image || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (field: string, value: string) => {
@@ -100,7 +104,11 @@ export default function CreateNews() {
         publishedAt: status === "published" ? new Date() : undefined
       };
 
-      addNews(articleData);
+      if (isEditing) {
+        await updateNews(id!, articleData);
+      } else {
+        await addNews(articleData);
+      }
 
       toast({
         title: "Success!",
@@ -128,9 +136,11 @@ export default function CreateNews() {
           Back to News
         </Button>
         <div>
-          <h2 className="text-3xl font-bold text-foreground">Create News Article</h2>
+          <h2 className="text-3xl font-bold text-foreground">
+            {isEditing ? 'Edit News Article' : 'Create News Article'}
+          </h2>
           <p className="text-muted-foreground">
-            Create and publish a new article for your university portal.
+            {isEditing ? 'Update article details' : 'Create and publish a new article for your university portal.'}
           </p>
         </div>
       </div>

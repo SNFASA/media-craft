@@ -59,7 +59,7 @@ const statusColors: Record<Event['status'], string> = {
 };
 
 export default function EventsIndex() {
-  const { events, deleteEvent, searchEvents } = useEventStore();
+  const { events, loading, deleteEvent, searchEvents } = useEventStore();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedEligibility, setSelectedEligibility] = useState<EventEligibility | "">("");
@@ -74,13 +74,21 @@ export default function EventsIndex() {
     currentPage * itemsPerPage
   );
 
-  const handleDelete = (id: string, title: string) => {
+  const handleDelete = async (id: string, title: string) => {
     if (window.confirm(`Are you sure you want to delete "${title}"?`)) {
-      deleteEvent(id);
-      toast({
-        title: "Event Deleted",
-        description: `"${title}" has been successfully deleted.`,
-      });
+      try {
+        await deleteEvent(id);
+        toast({
+          title: "Event Deleted",
+          description: `"${title}" has been successfully deleted.`,
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to delete event. Please try again.",
+          variant: "destructive"
+        });
+      }
     }
   };
 
@@ -159,7 +167,14 @@ export default function EventsIndex() {
       </Card>
 
       {/* Events Grid */}
-      {currentEvents.length === 0 ? (
+      {loading ? (
+        <Card className="shadow-soft">
+          <CardContent className="p-12 text-center">
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading events...</p>
+          </CardContent>
+        </Card>
+      ) : currentEvents.length === 0 ? (
         <Card className="shadow-soft">
           <CardContent className="p-12 text-center">
             <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />

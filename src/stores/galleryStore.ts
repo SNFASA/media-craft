@@ -1,5 +1,6 @@
 import { GalleryItem, GalleryCategory } from '@/types';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { supabase } from '@/integrations/supabase/client';
+import { useState, useEffect } from 'react';
 
 const mockGallery: GalleryItem[] = [
   {
@@ -52,31 +53,136 @@ const mockGallery: GalleryItem[] = [
 ];
 
 export function useGalleryStore() {
-  const [gallery, setGallery] = useLocalStorage<GalleryItem[]>('admin_gallery', mockGallery);
+  const [gallery, setGallery] = useState<GalleryItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const addGalleryItem = (itemData: Omit<GalleryItem, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const newItem: GalleryItem = {
-      id: Date.now().toString(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      ...itemData,
-    };
-    setGallery(prev => [newItem, ...prev]);
-    return newItem;
+  useEffect(() => {
+    fetchGallery();
+  }, []);
+
+  const fetchGallery = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('galleryitem')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const formattedGallery: GalleryItem[] = data.map(item => ({
+        id: item.id,
+        title: item.title,
+        description: item.description,
+        mainImage: item.main_image,
+        additionalImages: item.additional_images || [],
+        tags: item.tags || [],
+        category: item.category as GalleryCategory,
+        size: item.size as GalleryItem['size'],
+        date: new Date(item.date),
+        featured: item.featured || false,
+        createdAt: new Date(item.created_at),
+        updatedAt: new Date(item.updated_at),
+      }));
+
+      setGallery(formattedGallery);
+    } catch (error) {
+      console.error('Error fetching gallery:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const updateGalleryItem = (id: string, updates: Partial<GalleryItem>) => {
-    setGallery(prev => 
-      prev.map(item => 
-        item.id === id 
-          ? { ...item, ...updates, updatedAt: new Date() }
-          : item
-      )
-    );
+  const addGalleryItem = async (itemData: Omit<GalleryItem, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      const { data, error } = await supabase
+        .from('galleryitem')
+        .insert([{
+          title: itemData.title,
+          description: itemData.description,
+          main_image: itemData.mainImage,
+          additional_images: itemData.additionalImages,
+          tags: itemData.tags,
+          category: itemData.category,
+          size: itemData.size,
+          date: itemData.date.toISOString().split('T')[0],
+          featured: itemData.featured,
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      const newItem: GalleryItem = {
+        id: data.id,
+        title: data.title,
+        description: data.description,
+        mainImage: data.main_image,
+        additionalImages: data.additional_images || [],
+        tags: data.tags || [],
+        category: data.category as GalleryCategory,
+        size: data.size as GalleryItem['size'],
+        date: new Date(data.date),
+        featured: data.featured || false,
+        createdAt: new Date(data.created_at),
+        updatedAt: new Date(data.updated_at),
+      };
+
+      setGallery(prev => [newItem, ...prev]);
+      return newItem;
+    } catch (error) {
+      console.error('Error adding gallery item:', error);
+      throw error;
+    }
   };
 
-  const deleteGalleryItem = (id: string) => {
-    setGallery(prev => prev.filter(item => item.id !== id));
+  const updateGalleryItem = async (id: string, updates: Partial<GalleryItem>) => {
+    try {
+      const updateData: any = {};
+      if (updates.title !== undefined) updateData.title = updates.title;
+      if (updates.description !== undefined) updateData.description = updates.description;
+      if (updates.mainImage !== undefined) updateData.main_image = updates.mainImage;
+      if (updates.additionalImages !== undefined) updateData.additional_images = updates.additionalImages;
+      if (updates.tags !== undefined) updateData.tags = updates.tags;
+      if (updates.category !== undefined) updateData.category = updates.category;
+      if (updates.size !== undefined) updateData.size = updates.size;
+      if (updates.date !== undefined) updateData.date = updates.date.toISOString().split('T')[0];
+      if (updates.featured !== undefined) updateData.featured = updates.featured;
+
+      const { error } = await supabase
+        .from('galleryitem')
+        .update(updateData)
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setGallery(prev => 
+        prev.map(item => 
+          item.id === id 
+            ? { ...item, ...updates, updatedAt: new Date() }
+            : item
+        )
+      );
+    } catch (error) {
+      console.error('Error updating gallery item:', error);
+      throw error;
+    }
+  };
+
+  const deleteGalleryItem = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('galleryitem')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setGallery(prev => prev.filter(item => item.id !== id));
+    } catch (error) {
+      console.error('Error deleting gallery item:', error);
+      throw error;
+    }
   };
 
   const getGalleryItem = (id: string) => {
@@ -99,10 +205,12 @@ export function useGalleryStore() {
 
   return {
     gallery,
+    loading,
     addGalleryItem,
     updateGalleryItem,
     deleteGalleryItem,
     getGalleryItem,
     searchGallery,
+    fetchGallery,
   };
 }

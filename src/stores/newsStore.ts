@@ -1,5 +1,6 @@
 import { NewsArticle, NewsCategory } from '@/types';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { supabase } from '@/integrations/supabase/client';
+import { useState, useEffect } from 'react';
 
 // Mock data for initial state
 const mockNews: NewsArticle[] = [
@@ -44,37 +45,144 @@ const mockNews: NewsArticle[] = [
 ];
 
 export function useNewsStore() {
-  const [news, setNews] = useLocalStorage<NewsArticle[]>('admin_news', mockNews);
+  const [news, setNews] = useState<NewsArticle[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const addNews = (newsData: Omit<NewsArticle, 'id' | 'createdAt' | 'updatedAt' | 'slug'>) => {
-    const newArticle: NewsArticle = {
-      id: Date.now().toString(),
-      slug: generateSlug(newsData.title),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      ...newsData,
-    };
-    setNews(prev => [newArticle, ...prev]);
-    return newArticle;
+  useEffect(() => {
+    fetchNews();
+  }, []);
+
+  const fetchNews = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('newsarticle')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const formattedNews: NewsArticle[] = data.map(article => ({
+        id: article.id,
+        title: article.title,
+        description: article.description,
+        content: article.content,
+        category: article.category as NewsCategory,
+        slug: article.slug,
+        status: article.status as NewsArticle['status'],
+        author: article.author,
+        image: article.image || undefined,
+        createdAt: new Date(article.created_at),
+        updatedAt: new Date(article.updated_at),
+        publishedAt: article.published_at ? new Date(article.published_at) : undefined,
+      }));
+
+      setNews(formattedNews);
+    } catch (error) {
+      console.error('Error fetching news:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const updateNews = (id: string, updates: Partial<NewsArticle>) => {
-    setNews(prev => 
-      prev.map(article => 
-        article.id === id 
-          ? { 
-              ...article, 
-              ...updates, 
-              updatedAt: new Date(),
-              slug: updates.title ? generateSlug(updates.title) : article.slug
-            }
-          : article
-      )
-    );
+  const addNews = async (newsData: Omit<NewsArticle, 'id' | 'createdAt' | 'updatedAt' | 'slug'>) => {
+    try {
+      const slug = generateSlug(newsData.title);
+      const { data, error } = await supabase
+        .from('newsarticle')
+        .insert([{
+          title: newsData.title,
+          description: newsData.description,
+          content: newsData.content,
+          category: newsData.category,
+          slug: slug,
+          status: newsData.status,
+          author: newsData.author,
+          image: newsData.image,
+          published_at: newsData.publishedAt?.toISOString(),
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      const newArticle: NewsArticle = {
+        id: data.id,
+        title: data.title,
+        description: data.description,
+        content: data.content,
+        category: data.category as NewsCategory,
+        slug: data.slug,
+        status: data.status as NewsArticle['status'],
+        author: data.author,
+        image: data.image || undefined,
+        createdAt: new Date(data.created_at),
+        updatedAt: new Date(data.updated_at),
+        publishedAt: data.published_at ? new Date(data.published_at) : undefined,
+      };
+
+      setNews(prev => [newArticle, ...prev]);
+      return newArticle;
+    } catch (error) {
+      console.error('Error adding news:', error);
+      throw error;
+    }
   };
 
-  const deleteNews = (id: string) => {
-    setNews(prev => prev.filter(article => article.id !== id));
+  const updateNews = async (id: string, updates: Partial<NewsArticle>) => {
+    try {
+      const updateData: any = {};
+      if (updates.title !== undefined) {
+        updateData.title = updates.title;
+        updateData.slug = generateSlug(updates.title);
+      }
+      if (updates.description !== undefined) updateData.description = updates.description;
+      if (updates.content !== undefined) updateData.content = updates.content;
+      if (updates.category !== undefined) updateData.category = updates.category;
+      if (updates.status !== undefined) updateData.status = updates.status;
+      if (updates.author !== undefined) updateData.author = updates.author;
+      if (updates.image !== undefined) updateData.image = updates.image;
+      if (updates.publishedAt !== undefined) updateData.published_at = updates.publishedAt?.toISOString();
+
+      const { error } = await supabase
+        .from('newsarticle')
+        .update(updateData)
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setNews(prev => 
+        prev.map(article => 
+          article.id === id 
+            ? { 
+                ...article, 
+                ...updates, 
+                updatedAt: new Date(),
+                slug: updates.title ? generateSlug(updates.title) : article.slug
+              }
+            : article
+        )
+      );
+    } catch (error) {
+      console.error('Error updating news:', error);
+      throw error;
+    }
+  };
+
+  const deleteNews = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('newsarticle')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setNews(prev => prev.filter(article => article.id !== id));
+    } catch (error) {
+      console.error('Error deleting news:', error);
+      throw error;
+    }
   };
 
   const getNews = (id: string) => {
@@ -95,11 +203,13 @@ export function useNewsStore() {
 
   return {
     news,
+    loading,
     addNews,
     updateNews,
     deleteNews,
     getNews,
     searchNews,
+    fetchNews,
   };
 }
 

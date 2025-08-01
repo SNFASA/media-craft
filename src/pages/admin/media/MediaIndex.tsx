@@ -53,7 +53,7 @@ const typeColors = {
 };
 
 export default function MediaIndex() {
-  const { media, deleteMediaFile, addMediaFile, searchMedia, formatFileSize } = useMediaStore();
+  const { media, loading, deleteMediaFile, addMediaFile, searchMedia, formatFileSize } = useMediaStore();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState<MediaFile['type'] | "">("");
@@ -92,7 +92,7 @@ export default function MediaIndex() {
           size: file.size
         };
 
-        addMediaFile(fileData);
+        await addMediaFile(fileData);
       }
 
       toast({
@@ -112,13 +112,21 @@ export default function MediaIndex() {
     }
   };
 
-  const handleDelete = (id: string, filename: string) => {
+  const handleDelete = async (id: string, filename: string) => {
     if (window.confirm(`Are you sure you want to delete "${filename}"?`)) {
-      deleteMediaFile(id);
-      toast({
-        title: "File Deleted",
-        description: `"${filename}" has been successfully deleted.`,
-      });
+      try {
+        await deleteMediaFile(id);
+        toast({
+          title: "File Deleted",
+          description: `"${filename}" has been successfully deleted.`,
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to delete file. Please try again.",
+          variant: "destructive"
+        });
+      }
     }
   };
 

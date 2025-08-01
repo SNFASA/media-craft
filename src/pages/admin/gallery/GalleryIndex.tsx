@@ -57,7 +57,7 @@ const sizeColors = {
 };
 
 export default function GalleryIndex() {
-  const { gallery, deleteGalleryItem, searchGallery } = useGalleryStore();
+  const { gallery, loading, deleteGalleryItem, searchGallery } = useGalleryStore();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<GalleryCategory | "">("");
@@ -72,13 +72,21 @@ export default function GalleryIndex() {
     currentPage * itemsPerPage
   );
 
-  const handleDelete = (id: string, title: string) => {
+  const handleDelete = async (id: string, title: string) => {
     if (window.confirm(`Are you sure you want to delete "${title}"?`)) {
-      deleteGalleryItem(id);
-      toast({
-        title: "Gallery Item Deleted",
-        description: `"${title}" has been successfully deleted.`,
-      });
+      try {
+        await deleteGalleryItem(id);
+        toast({
+          title: "Gallery Item Deleted",
+          description: `"${title}" has been successfully deleted.`,
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to delete gallery item. Please try again.",
+          variant: "destructive"
+        });
+      }
     }
   };
 
