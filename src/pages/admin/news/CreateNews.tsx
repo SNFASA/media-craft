@@ -1,7 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useNewsStore } from "@/stores/newsStore";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { NewsArticle, NewsCategory } from "@/types";
+import { useToast } from "@/hooks/use-toast";
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,15 +19,14 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from "@/components/ui/select";
+
 import { ArrowLeft, Save, Eye, Upload, X } from "lucide-react";
-import { NewsCategory } from "@/types";
-import { useToast } from "@/hooks/use-toast";
 
 const categoryLabels: Record<NewsCategory, string> = {
   general: "General",
-  academic: "Academic", 
+  academic: "Academic",
   research: "Research",
   events: "Events",
   announcements: "Announcements",
@@ -28,23 +35,42 @@ const categoryLabels: Record<NewsCategory, string> = {
 
 export default function CreateNews() {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const { addNews, updateNews, getNews } = useNewsStore();
   const { toast } = useToast();
-  
+
   const isEditing = Boolean(id);
-  const existingNews = isEditing ? getNews(id!) : null;
-  
+  const [existingNews, setExistingNews] = useState<NewsArticle | null>(null);
+
   const [formData, setFormData] = useState({
-    title: existingNews?.title || "",
-    description: existingNews?.description || "",
-    content: existingNews?.content || "",
-    category: existingNews?.category || "" as NewsCategory | "",
-    status: existingNews?.status || "draft" as "draft" | "published",
-    author: existingNews?.author || ""
+    title: "",
+    description: "",
+    content: "",
+    category: "" as NewsCategory | "",
+    status: "draft" as "draft" | "published",
+    author: ""
   });
-  const [imagePreview, setImagePreview] = useState<string>(existingNews?.image || "");
+
+  const [imagePreview, setImagePreview] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (isEditing && id) {
+      const article = getNews(id);
+      if (article) {
+        setExistingNews(article);
+        setFormData({
+          title: article.title,
+          description: article.description,
+          content: article.content,
+          category: article.category,
+          status: article.status,
+          author: article.author
+        });
+        setImagePreview(article.image || "");
+      }
+    }
+  }, [isEditing, id, getNews]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -77,7 +103,7 @@ export default function CreateNews() {
 
     if (!formData.category) {
       toast({
-        title: "Validation Error", 
+        title: "Validation Error",
         description: "Please select a category.",
         variant: "destructive"
       });
@@ -98,14 +124,14 @@ export default function CreateNews() {
     try {
       const articleData = {
         ...formData,
-        category: formData.category as NewsCategory,
+        category: formData.category,
         status,
         image: imagePreview,
         publishedAt: status === "published" ? new Date() : undefined
       };
 
-      if (isEditing) {
-        await updateNews(id!, articleData);
+      if (isEditing && id) {
+        await updateNews(id, articleData);
       } else {
         await addNews(articleData);
       }
@@ -117,6 +143,7 @@ export default function CreateNews() {
 
       navigate("/admin/news");
     } catch (error) {
+      console.error("Failed to save article:", error);
       toast({
         title: "Error",
         description: "Failed to save article. Please try again.",
@@ -137,10 +164,12 @@ export default function CreateNews() {
         </Button>
         <div>
           <h2 className="text-3xl font-bold text-foreground">
-            {isEditing ? 'Edit News Article' : 'Create News Article'}
+            {isEditing ? "Edit News Article" : "Create News Article"}
           </h2>
           <p className="text-muted-foreground">
-            {isEditing ? 'Update article details' : 'Create and publish a new article for your university portal.'}
+            {isEditing
+              ? "Update article details"
+              : "Create and publish a new article for your university portal."}
           </p>
         </div>
       </div>
@@ -213,7 +242,10 @@ export default function CreateNews() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="category">Category *</Label>
-                <Select value={formData.category} onValueChange={(value) => handleInputChange("category", value)}>
+                <Select
+                  value={formData.category}
+                  onValueChange={(value) => handleInputChange("category", value)}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>

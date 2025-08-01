@@ -51,7 +51,7 @@ const statusColors = {
 };
 
 export default function NewsIndex() {
-  const { news, loading, deleteNews, searchNews } = useNewsStore();
+  const { news, deleteNews, searchNews } = useNewsStore();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<NewsCategory | "all">("all");
@@ -69,9 +69,13 @@ export default function NewsIndex() {
         description: `"${title}" has been successfully deleted.`,
       });
     } catch (error) {
+      let message = "Failed to delete article. Please try again.";
+      if (error instanceof Error && error.message) {
+        message = error.message;
+      }
       toast({
         title: "Error",
-        description: "Failed to delete article. Please try again.",
+        description: message,
         variant: "destructive"
       });
     }
@@ -204,7 +208,7 @@ export default function NewsIndex() {
                     </div>
                     <div className="flex items-center gap-1">
                       <User className="h-4 w-4" />
-                      Admin
+                      {article.author}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">

@@ -4,7 +4,7 @@ import { useNewsStore } from "@/stores/newsStore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Edit, Calendar, User, Eye, Share } from "lucide-react";
+import { ArrowLeft, Edit, Calendar, User, Eye } from "lucide-react";
 
 const categoryLabels = {
   general: "General",
@@ -74,10 +74,6 @@ export default function ViewNews() {
           </Button>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
-            <Share className="h-4 w-4 mr-2" />
-            Share
-          </Button>
           <Button asChild size="sm">
             <Link to={`/admin/news/${article.id}/edit`}>
               <Edit className="h-4 w-4 mr-2" />
@@ -117,7 +113,7 @@ export default function ViewNews() {
             <div className="flex items-center gap-6 text-sm text-muted-foreground pt-4 border-t border-border">
               <div className="flex items-center gap-2">
                 <User className="h-4 w-4" />
-                <span>Admin</span>
+                <span>{article.author}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
