@@ -87,7 +87,7 @@ export function useNewsStore() {
 
   const addNews = async (newsData: Omit<NewsArticle, 'id' | 'createdAt' | 'updatedAt' | 'slug'>) => {
     try {
-      const slug = generateSlug(newsData.title);
+      const slug = await generateUniqueSlug(newsData.title);
       const { data, error } = await supabase
         .from('newsarticle')
         .insert([{
@@ -134,7 +134,7 @@ export function useNewsStore() {
       const updateData: any = {};
       if (updates.title !== undefined) {
         updateData.title = updates.title;
-        updateData.slug = generateSlug(updates.title);
+        updateData.slug = await generateUniqueSlug(updates.title, id);
       }
       if (updates.description !== undefined) updateData.description = updates.description;
       if (updates.content !== undefined) updateData.content = updates.content;
@@ -158,7 +158,7 @@ export function useNewsStore() {
                 ...article, 
                 ...updates, 
                 updatedAt: new Date(),
-                slug: updates.title ? generateSlug(updates.title) : article.slug
+                slug: updates.title ? updateData.slug : article.slug
               }
             : article
         )
@@ -220,4 +220,32 @@ function generateSlug(title: string): string {
     .replace(/[^\w\s-]/g, '')
     .replace(/[\s_-]+/g, '-')
     .replace(/^-+|-+$/g, '');
+}
+
+async function generateUniqueSlug(title: string, excludeId?: string): Promise<string> {
+  const baseSlug = generateSlug(title);
+  let slug = baseSlug;
+  let counter = 1;
+
+  while (true) {
+    const { data, error } = await supabase
+      .from('newsarticle')
+      .select('id')
+      .eq('slug', slug)
+      .limit(1);
+
+    if (error) {
+      console.error('Error checking slug uniqueness:', error);
+      return slug;
+    }
+
+    // If no existing record found, or found record is the one we're updating
+    if (!data || data.length === 0 || (excludeId && data[0]?.id === excludeId)) {
+      return slug;
+    }
+
+    // Generate new slug with counter
+    slug = `${baseSlug}-${counter}`;
+    counter++;
+  }
 }
