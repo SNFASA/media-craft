@@ -45,7 +45,6 @@ export default function CreateEvent() {
     location: existingEvent?.location || "",
     eligibility: existingEvent?.eligibility || "" as EventEligibility | "",
     registrationRequired: existingEvent?.registrationRequired || false,
-    capacity: existingEvent?.capacity?.toString() || "",
     status: existingEvent?.status || "upcoming" as Event['status']
   });
   const [imagePreview, setImagePreview] = useState<string>(existingEvent?.image || "");
@@ -101,22 +100,21 @@ export default function CreateEvent() {
     setIsSubmitting(true);
 
     try {
-      const Event = {
+      const eventData = {
         ...formData,
         date: new Date(formData.date),
         eligibility: formData.eligibility as EventEligibility,
-        capacity: formData.capacity ? parseInt(formData.capacity) : undefined,
         image: imagePreview || undefined
       };
 
       if (isEditing) {
-        await updateEvent(id!, Event);
+        await updateEvent(id!, eventData);
         toast({
           title: "Success!",
           description: "Event updated successfully."
         });
       } else {
-        await addEvent(Event);
+        await addEvent(eventData);
         toast({
           title: "Success!",
           description: "Event created successfully."
@@ -265,16 +263,6 @@ export default function CreateEvent() {
                 <Label htmlFor="registration">Registration Required</Label>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="capacity">Capacity (Optional)</Label>
-                <Input
-                  id="capacity"
-                  type="number"
-                  value={formData.capacity}
-                  onChange={(e) => handleInputChange("capacity", e.target.value)}
-                  placeholder="Maximum attendees..."
-                />
-              </div>
 
               <Button
                 onClick={handleSubmit}

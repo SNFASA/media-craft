@@ -63,6 +63,7 @@ export function useMediaStore() {
       setMedia(formattedMedia);
     } catch (error) {
       console.error('Error fetching media:', error);
+      setMedia([]); // Set empty array on error
     } finally {
       setLoading(false);
     }

@@ -264,12 +264,6 @@ export default function EventsIndex() {
                     <Users className="h-4 w-4 text-muted-foreground" />
                     <span>{eligibilityLabels[event.eligibility]}</span>
                   </div>
-                  {event.capacity && (
-                    <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4 text-muted-foreground" />
-                      <span>Capacity: {event.capacity}</span>
-                    </div>
-                  )}
                 </div>
               </CardContent>
             </Card>

@@ -88,6 +88,7 @@ export function useGalleryStore() {
       setGallery(formattedGallery);
     } catch (error) {
       console.error('Error fetching gallery:', error);
+      setGallery([]); // Set empty array on error
     } finally {
       setLoading(false);
     }

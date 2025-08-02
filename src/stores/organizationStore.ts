@@ -190,6 +190,9 @@ export function useOrganizationStore() {
       setItcOrg(itcSections);
     } catch (error) {
       console.error('Error fetching organizations:', error);
+      // Set empty organizations on error
+      setDeanOrg([]);
+      setItcOrg([]);
     } finally {
       setLoading(false);
     }

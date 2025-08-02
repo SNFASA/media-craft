@@ -30,18 +30,18 @@ export function useEventStore() {
         location: event.location,
         eligibility: event.eligibility as EventEligibility,
         registrationRequired: event.registration_required ?? false,
-        status: event.status,
+        status: event.status as Event['status'],
         createdAt: new Date(event.created_at),
         updatedAt: new Date(event.updated_at),
-        details: {
-          agenda: event.details?.agenda ?? undefined,
-          isFree: event.details?.isFree ?? undefined,
-          hasCertificate: event.details?.hasCertificate ?? undefined,
-          hasRefreshments: event.details?.hasRefreshments ?? undefined,
-          hasTrasportation: event.details?.hasTrasportation ?? undefined,
-          isOnline: event.details?.isOnline ?? undefined,
-          isLimited: event.details?.isLimited ?? undefined,
-        },
+        details: event.details ? {
+          agenda: event.details.agenda ?? undefined,
+          isFree: event.details.isFree ?? undefined,
+          hasCertificate: event.details.hasCertificate ?? undefined,
+          hasRefreshments: event.details.hasRefreshments ?? undefined,
+          hasTrasportation: event.details.hasTrasportation ?? undefined,
+          isOnline: event.details.isOnline ?? undefined,
+          isLimited: event.details.isLimited ?? undefined,
+        } : undefined,
       }));
 
       setEvents(formattedEvents);
@@ -91,18 +91,18 @@ export function useEventStore() {
         location: data.location,
         eligibility: data.eligibility as EventEligibility,
         registrationRequired: data.registration_required,
-        status: data.status,
+        status: data.status as Event['status'],
         createdAt: new Date(data.created_at),
         updatedAt: new Date(data.updated_at),
-        details: {
-          agenda: data.details?.agenda ?? undefined,
-          isFree: data.details?.isFree ?? undefined,
-          hasCertificate: data.details?.hasCertificate ?? undefined,
-          hasRefreshments: data.details?.hasRefreshments ?? undefined,
-          hasTrasportation: data.details?.hasTrasportation ?? undefined,
-          isOnline: data.details?.isOnline ?? undefined,
-          isLimited: data.details?.isLimited ?? undefined,
-        },
+        details: (data as any).details ? {
+          agenda: (data as any).details.agenda ?? undefined,
+          isFree: (data as any).details.isFree ?? undefined,
+          hasCertificate: (data as any).details.hasCertificate ?? undefined,
+          hasRefreshments: (data as any).details.hasRefreshments ?? undefined,
+          hasTrasportation: (data as any).details.hasTrasportation ?? undefined,
+          isOnline: (data as any).details.isOnline ?? undefined,
+          isLimited: (data as any).details.isLimited ?? undefined,
+        } : undefined,
       };
 
       setEvents(prev => [newEvent, ...prev]);
@@ -170,7 +170,7 @@ export function useEventStore() {
     return events.find(event => event.id === id);
   };
 
-  const searchEvents = (query: string, eligibility?: EventEligibility) => {
+  const searchEvents = (query: string, eligibility?: EventEligibility, status?: Event['status']) => {
     return events.filter(event => {
       const matchesQuery =
         !query ||
@@ -179,8 +179,9 @@ export function useEventStore() {
         event.location?.toLowerCase().includes(query.toLowerCase());
 
       const matchesEligibility = !eligibility || event.eligibility === eligibility;
+      const matchesStatus = !status || event.status === status;
 
-      return matchesQuery && matchesEligibility;
+      return matchesQuery && matchesEligibility && matchesStatus;
     });
   };
 

@@ -156,15 +156,6 @@ export default function ViewEvent() {
                 </div>
               </div>
 
-              {event.capacity && (
-                <div className="flex items-center gap-3">
-                  <Users className="h-5 w-5 text-muted-foreground" />
-                  <div>
-                    <p className="font-medium">{event.capacity}</p>
-                    <p className="text-sm text-muted-foreground">Capacity</p>
-                  </div>
-                </div>
-              )}
 
               {event.registrationRequired && (
                 <div className="flex items-center gap-3">
