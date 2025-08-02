@@ -190,6 +190,7 @@ export default function CreateNews() {
                   onChange={(e) => handleInputChange("title", e.target.value)}
                   placeholder="Enter article title..."
                   className="text-lg"
+                  disabled={false}
                 />
               </div>
 
@@ -201,6 +202,7 @@ export default function CreateNews() {
                   onChange={(e) => handleInputChange("description", e.target.value)}
                   placeholder="Brief description of the article..."
                   rows={3}
+                  disabled={false}
                 />
               </div>
 
@@ -211,6 +213,7 @@ export default function CreateNews() {
                   value={formData.author}
                   onChange={(e) => handleInputChange("author", e.target.value)}
                   placeholder="Enter author name..."
+                  disabled={false}
                 />
               </div>
 
@@ -223,6 +226,7 @@ export default function CreateNews() {
                   placeholder="Write your article content here..."
                   rows={12}
                   className="min-h-[300px]"
+                  disabled={false}
                 />
                 <p className="text-xs text-muted-foreground">
                   Tip: You can use HTML tags for rich formatting.

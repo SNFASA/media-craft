@@ -47,11 +47,25 @@ export default function CreateEvent() {
     registrationRequired: existingEvent?.registrationRequired || false,
     status: existingEvent?.status || "upcoming" as Event['status']
   });
+
+  const [eventDetails, setEventDetails] = useState({
+    agenda: existingEvent?.details?.agenda || "",
+    isFree: existingEvent?.details?.isFree || false,
+    hasCertificate: existingEvent?.details?.hasCertificate || false,
+    hasRefreshments: existingEvent?.details?.hasRefreshments || false,
+    hasTrasportation: existingEvent?.details?.hasTrasportation || false,
+    isOnline: existingEvent?.details?.isOnline || false,
+    isLimited: existingEvent?.details?.isLimited || false
+  });
   const [imagePreview, setImagePreview] = useState<string>(existingEvent?.image || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleDetailsChange = (field: string, value: string | boolean) => {
+    setEventDetails(prev => ({ ...prev, [field]: value }));
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -104,7 +118,8 @@ export default function CreateEvent() {
         ...formData,
         date: new Date(formData.date),
         eligibility: formData.eligibility as EventEligibility,
-        image: imagePreview || undefined
+        image: imagePreview || undefined,
+        details: eventDetails
       };
 
       if (isEditing) {
@@ -262,7 +277,81 @@ export default function CreateEvent() {
                 />
                 <Label htmlFor="registration">Registration Required</Label>
               </div>
+            </CardContent>
+          </Card>
 
+          {/* Event Details */}
+          <Card className="shadow-soft">
+            <CardHeader>
+              <CardTitle>Event Details</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="agenda">Agenda</Label>
+                <Textarea
+                  id="agenda"
+                  value={eventDetails.agenda}
+                  onChange={(e) => handleDetailsChange("agenda", e.target.value)}
+                  placeholder="Event agenda or schedule..."
+                  rows={3}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="isFree"
+                    checked={eventDetails.isFree}
+                    onCheckedChange={(checked) => handleDetailsChange("isFree", checked as boolean)}
+                  />
+                  <Label htmlFor="isFree">Free Event</Label>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="hasCertificate"
+                    checked={eventDetails.hasCertificate}
+                    onCheckedChange={(checked) => handleDetailsChange("hasCertificate", checked as boolean)}
+                  />
+                  <Label htmlFor="hasCertificate">Certificate</Label>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="hasRefreshments"
+                    checked={eventDetails.hasRefreshments}
+                    onCheckedChange={(checked) => handleDetailsChange("hasRefreshments", checked as boolean)}
+                  />
+                  <Label htmlFor="hasRefreshments">Refreshments</Label>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="hasTrasportation"
+                    checked={eventDetails.hasTrasportation}
+                    onCheckedChange={(checked) => handleDetailsChange("hasTrasportation", checked as boolean)}
+                  />
+                  <Label htmlFor="hasTrasportation">Transportation</Label>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="isOnline"
+                    checked={eventDetails.isOnline}
+                    onCheckedChange={(checked) => handleDetailsChange("isOnline", checked as boolean)}
+                  />
+                  <Label htmlFor="isOnline">Online Event</Label>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="isLimited"
+                    checked={eventDetails.isLimited}
+                    onCheckedChange={(checked) => handleDetailsChange("isLimited", checked as boolean)}
+                  />
+                  <Label htmlFor="isLimited">Limited Seats</Label>
+                </div>
+              </div>
 
               <Button
                 onClick={handleSubmit}

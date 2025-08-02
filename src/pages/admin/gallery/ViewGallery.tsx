@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { useGalleryStore } from '@/stores/galleryStore';
 import { GalleryCategory } from '@/types';
+import { convertGoogleDriveUrl } from '@/utils/imageUtils';
 import { 
   ArrowLeft, 
   Edit, 
@@ -120,7 +121,7 @@ const ViewGallery = () => {
           <Card>
             <CardContent className="p-0">
               <img
-                src={item.mainImage}
+                src={convertGoogleDriveUrl(item.mainImage)}
                 alt={item.title}
                 className="w-full h-96 object-cover rounded-lg"
                 onError={(e) => {
@@ -158,7 +159,7 @@ const ViewGallery = () => {
                   {item.additionalImages.map((image, index) => (
                     <div key={index} className="relative">
                       <img
-                        src={image}
+                        src={convertGoogleDriveUrl(image)}
                         alt={`${item.title} - Image ${index + 1}`}
                         className="w-full h-48 object-cover rounded-lg"
                         onError={(e) => {
