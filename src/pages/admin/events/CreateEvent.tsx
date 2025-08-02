@@ -35,7 +35,7 @@ export default function CreateEvent() {
   const { toast } = useToast();
   
   const isEditing = Boolean(id);
-  const existingEvent = isEditing ? getEvent(id!) : null;
+  const existingEvent = isEditing ? getEvent(id) : null;
   
   const [formData, setFormData] = useState({
     title: existingEvent?.title || "",
@@ -101,7 +101,7 @@ export default function CreateEvent() {
     setIsSubmitting(true);
 
     try {
-      const eventData = {
+      const Event = {
         ...formData,
         date: new Date(formData.date),
         eligibility: formData.eligibility as EventEligibility,
@@ -110,13 +110,13 @@ export default function CreateEvent() {
       };
 
       if (isEditing) {
-        await updateEvent(id!, eventData);
+        await updateEvent(id!, Event);
         toast({
           title: "Success!",
           description: "Event updated successfully."
         });
       } else {
-        await addEvent(eventData);
+        await addEvent(Event);
         toast({
           title: "Success!",
           description: "Event created successfully."

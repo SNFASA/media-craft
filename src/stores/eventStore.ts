@@ -1,51 +1,6 @@
-import { Event, EventEligibility } from '@/types';
-import { supabase } from '@/integrations/supabase/client';
 import { useState, useEffect } from 'react';
-
-const mockEvents: Event[] = [
-  {
-    id: '1',
-    title: 'Annual Science Fair',
-    description: 'Showcase of innovative student research projects and scientific discoveries.',
-    image: 'https://images.unsplash.com/photo-1517022812141-23620dba5c23?w=800',
-    date: new Date('2024-03-15'),
-    time: '10:00 AM',
-    location: 'Main Auditorium',
-    eligibility: 'all-students',
-    registrationRequired: true,
-    capacity: 500,
-    status: 'upcoming',
-    createdAt: new Date('2024-01-20'),
-    updatedAt: new Date('2024-01-20'),
-  },
-  {
-    id: '2',
-    title: 'Career Development Workshop',
-    description: 'Professional development session focusing on resume building and interview skills.',
-    date: new Date('2024-02-28'),
-    time: '2:00 PM',
-    location: 'Conference Room A',
-    eligibility: 'undergraduates',
-    registrationRequired: true,
-    capacity: 50,
-    status: 'upcoming',
-    createdAt: new Date('2024-01-18'),
-    updatedAt: new Date('2024-01-18'),
-  },
-  {
-    id: '3',
-    title: 'Faculty Research Symposium',
-    description: 'Annual presentation of ongoing research projects by faculty members.',
-    date: new Date('2024-04-10'),
-    time: '9:00 AM',
-    location: 'Research Building Hall',
-    eligibility: 'faculty',
-    registrationRequired: false,
-    status: 'upcoming',
-    createdAt: new Date('2024-01-15'),
-    updatedAt: new Date('2024-01-15'),
-  },
-];
+import { supabase } from '@/integrations/supabase/client';
+import { Event, EventEligibility } from '@/types';
 
 export function useEventStore() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -65,7 +20,7 @@ export function useEventStore() {
 
       if (error) throw error;
 
-      const formattedEvents: Event[] = data.map(event => ({
+      const formattedEvents: Event[] = data.map((event: any): Event => ({
         id: event.id,
         title: event.title,
         description: event.description,
@@ -74,11 +29,19 @@ export function useEventStore() {
         time: event.time,
         location: event.location,
         eligibility: event.eligibility as EventEligibility,
-        registrationRequired: event.registration_required || false,
-        capacity: event.capacity || undefined,
-        status: event.status as Event['status'],
+        registrationRequired: event.registration_required ?? false,
+        status: event.status,
         createdAt: new Date(event.created_at),
         updatedAt: new Date(event.updated_at),
+        details: {
+          agenda: event.details?.agenda ?? undefined,
+          isFree: event.details?.isFree ?? undefined,
+          hasCertificate: event.details?.hasCertificate ?? undefined,
+          hasRefreshments: event.details?.hasRefreshments ?? undefined,
+          hasTrasportation: event.details?.hasTrasportation ?? undefined,
+          isOnline: event.details?.isOnline ?? undefined,
+          isLimited: event.details?.isLimited ?? undefined,
+        },
       }));
 
       setEvents(formattedEvents);
@@ -97,13 +60,21 @@ export function useEventStore() {
           title: eventData.title,
           description: eventData.description,
           image: eventData.image,
-          date: eventData.date.toISOString().split('T')[0],
+          date: eventData.date.toISOString(),
           time: eventData.time,
           location: eventData.location,
           eligibility: eventData.eligibility,
           registration_required: eventData.registrationRequired,
-          capacity: eventData.capacity,
           status: eventData.status,
+          details: {
+            agenda: eventData.details?.agenda,
+            isFree: eventData.details?.isFree,
+            hasCertificate: eventData.details?.hasCertificate,
+            hasRefreshments: eventData.details?.hasRefreshments,
+            hasTrasportation: eventData.details?.hasTrasportation,
+            isOnline: eventData.details?.isOnline,
+            isLimited: eventData.details?.isLimited,
+          },
         }])
         .select()
         .single();
@@ -119,11 +90,19 @@ export function useEventStore() {
         time: data.time,
         location: data.location,
         eligibility: data.eligibility as EventEligibility,
-        registrationRequired: data.registration_required || false,
-        capacity: data.capacity || undefined,
-        status: data.status as Event['status'],
+        registrationRequired: data.registration_required,
+        status: data.status,
         createdAt: new Date(data.created_at),
         updatedAt: new Date(data.updated_at),
+        details: {
+          agenda: data.details?.agenda ?? undefined,
+          isFree: data.details?.isFree ?? undefined,
+          hasCertificate: data.details?.hasCertificate ?? undefined,
+          hasRefreshments: data.details?.hasRefreshments ?? undefined,
+          hasTrasportation: data.details?.hasTrasportation ?? undefined,
+          isOnline: data.details?.isOnline ?? undefined,
+          isLimited: data.details?.isLimited ?? undefined,
+        },
       };
 
       setEvents(prev => [newEvent, ...prev]);
@@ -134,19 +113,24 @@ export function useEventStore() {
     }
   };
 
-  const updateEvent = async (id: string, updates: Partial<Event>) => {
+  const updateEvent = async (id: string, updates: Partial<Omit<Event, 'createdAt' | 'updatedAt'>>) => {
     try {
-      const updateData: any = {};
-      if (updates.title !== undefined) updateData.title = updates.title;
-      if (updates.description !== undefined) updateData.description = updates.description;
-      if (updates.image !== undefined) updateData.image = updates.image;
-      if (updates.date !== undefined) updateData.date = updates.date.toISOString().split('T')[0];
-      if (updates.time !== undefined) updateData.time = updates.time;
-      if (updates.location !== undefined) updateData.location = updates.location;
-      if (updates.eligibility !== undefined) updateData.eligibility = updates.eligibility;
-      if (updates.registrationRequired !== undefined) updateData.registration_required = updates.registrationRequired;
-      if (updates.capacity !== undefined) updateData.capacity = updates.capacity;
-      if (updates.status !== undefined) updateData.status = updates.status;
+      const updateData: Record<string, any> = {};
+
+      const addIfDefined = <T>(key: string, value: T | undefined) => {
+        if (value !== undefined) updateData[key] = value;
+      };
+
+      addIfDefined('title', updates.title);
+      addIfDefined('description', updates.description);
+      addIfDefined('image', updates.image);
+      addIfDefined('date', updates.date?.toISOString());
+      addIfDefined('time', updates.time);
+      addIfDefined('location', updates.location);
+      addIfDefined('eligibility', updates.eligibility);
+      addIfDefined('registration_required', updates.registrationRequired);
+      addIfDefined('status', updates.status);
+      if (updates.details !== undefined) addIfDefined('details', updates.details);
 
       const { error } = await supabase
         .from('event')
@@ -155,11 +139,9 @@ export function useEventStore() {
 
       if (error) throw error;
 
-      setEvents(prev => 
-        prev.map(event => 
-          event.id === id 
-            ? { ...event, ...updates, updatedAt: new Date() }
-            : event
+      setEvents(prev =>
+        prev.map(event =>
+          event.id === id ? { ...event, ...updates, updatedAt: new Date() } : event
         )
       );
     } catch (error) {
@@ -188,28 +170,28 @@ export function useEventStore() {
     return events.find(event => event.id === id);
   };
 
-  const searchEvents = (query: string, eligibility?: EventEligibility, status?: Event['status']) => {
+  const searchEvents = (query: string, eligibility?: EventEligibility) => {
     return events.filter(event => {
-      const matchesQuery = query === '' || 
+      const matchesQuery =
+        !query ||
         event.title.toLowerCase().includes(query.toLowerCase()) ||
-        event.description.toLowerCase().includes(query.toLowerCase()) ||
-        event.location.toLowerCase().includes(query.toLowerCase());
-      
+        event.description?.toLowerCase().includes(query.toLowerCase()) ||
+        event.location?.toLowerCase().includes(query.toLowerCase());
+
       const matchesEligibility = !eligibility || event.eligibility === eligibility;
-      const matchesStatus = !status || event.status === status;
-      
-      return matchesQuery && matchesEligibility && matchesStatus;
+
+      return matchesQuery && matchesEligibility;
     });
   };
 
   return {
     events,
     loading,
+    fetchEvents,
     addEvent,
     updateEvent,
     deleteEvent,
     getEvent,
     searchEvents,
-    fetchEvents,
   };
 }

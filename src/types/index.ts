@@ -31,7 +31,15 @@ export interface Event {
   location: string;
   eligibility: EventEligibility;
   registrationRequired: boolean;
-  capacity?: number;
+  details?: {
+    agenda?: string
+    isFree?: boolean
+    hasCertificate?: boolean
+    hasRefreshments?: boolean
+    hasTrasportation?: boolean
+    isOnline?: boolean
+    isLimited?: boolean
+  }
   status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
   createdAt: Date;
   updatedAt: Date;
